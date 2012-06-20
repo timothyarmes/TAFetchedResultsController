@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model name="" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1171" systemVersion="11E53" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="Item" representedClassName="Item" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="section" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Section" inverseName="items" inverseEntity="Section" syncable="YES"/>
+    </entity>
+    <entity name="Section" representedClassName="Section" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="timeStamp" optional="YES" attributeType="Date" syncable="YES"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Item" inverseName="section" inverseEntity="Item" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Section" positionX="160" positionY="192" width="128" height="90"/>
+        <element name="Item" positionX="160" positionY="192" width="128" height="75"/>
+    </elements>
+</model>

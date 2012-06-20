@@ -1,0 +1,343 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2273D2471592065E00778B21 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2273D2461592065E00778B21 /* UIKit.framework */; };
+		2273D2491592065E00778B21 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2273D2481592065E00778B21 /* Foundation.framework */; };
+		2273D24B1592065E00778B21 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2273D24A1592065E00778B21 /* CoreGraphics.framework */; };
+		2273D24D1592065E00778B21 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2273D24C1592065E00778B21 /* CoreData.framework */; };
+		2273D2531592065E00778B21 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2273D2511592065E00778B21 /* InfoPlist.strings */; };
+		2273D2551592065E00778B21 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2273D2541592065E00778B21 /* main.m */; };
+		2273D2591592065E00778B21 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 2273D2581592065E00778B21 /* AppDelegate.m */; };
+		2273D25C1592065E00778B21 /* TAFetchedResultsControllerDemo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2273D25A1592065E00778B21 /* TAFetchedResultsControllerDemo.xcdatamodeld */; };
+		2273D2621592065E00778B21 /* DemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2273D2611592065E00778B21 /* DemoViewController.m */; };
+		2273D2681592065E00778B21 /* DemoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2273D2661592065E00778B21 /* DemoViewController.xib */; };
+		2273D270159209E900778B21 /* Item.m in Sources */ = {isa = PBXBuildFile; fileRef = 2273D26F159209E900778B21 /* Item.m */; };
+		2273D273159209E900778B21 /* Section.m in Sources */ = {isa = PBXBuildFile; fileRef = 2273D272159209E900778B21 /* Section.m */; };
+		2273D27615920F0A00778B21 /* TAFetchedResultsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2273D27515920F0A00778B21 /* TAFetchedResultsController.m */; };
+		2273D27A15920FA800778B21 /* TADelegateInterceptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 2273D27915920FA800778B21 /* TADelegateInterceptor.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		2273D2421592065E00778B21 /* TAFetchedResultsControllerDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TAFetchedResultsControllerDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2273D2461592065E00778B21 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		2273D2481592065E00778B21 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		2273D24A1592065E00778B21 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		2273D24C1592065E00778B21 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		2273D2501592065E00778B21 /* TAFetchedResultsControllerDemo-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TAFetchedResultsControllerDemo-Info.plist"; sourceTree = "<group>"; };
+		2273D2521592065E00778B21 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		2273D2541592065E00778B21 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		2273D2561592065E00778B21 /* TAFetchedResultsControllerDemo-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TAFetchedResultsControllerDemo-Prefix.pch"; sourceTree = "<group>"; };
+		2273D2571592065E00778B21 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		2273D2581592065E00778B21 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		2273D25B1592065E00778B21 /* TAFetchedResultsControllerDemo.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TAFetchedResultsControllerDemo.xcdatamodel; sourceTree = "<group>"; };
+		2273D2601592065E00778B21 /* DemoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DemoViewController.h; sourceTree = "<group>"; };
+		2273D2611592065E00778B21 /* DemoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DemoViewController.m; sourceTree = "<group>"; };
+		2273D2671592065E00778B21 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/DemoViewController.xib; sourceTree = "<group>"; };
+		2273D26E159209E900778B21 /* Item.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Item.h; sourceTree = "<group>"; };
+		2273D26F159209E900778B21 /* Item.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Item.m; sourceTree = "<group>"; };
+		2273D271159209E900778B21 /* Section.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Section.h; sourceTree = "<group>"; };
+		2273D272159209E900778B21 /* Section.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Section.m; sourceTree = "<group>"; };
+		2273D27415920F0A00778B21 /* TAFetchedResultsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TAFetchedResultsController.h; path = ../../TAFetchedResultsController/TAFetchedResultsController.h; sourceTree = "<group>"; };
+		2273D27515920F0A00778B21 /* TAFetchedResultsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TAFetchedResultsController.m; path = ../../TAFetchedResultsController/TAFetchedResultsController.m; sourceTree = "<group>"; };
+		2273D27815920FA800778B21 /* TADelegateInterceptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TADelegateInterceptor.h; path = ../../TAFetchedResultsController/TADelegateInterceptor.h; sourceTree = "<group>"; };
+		2273D27915920FA800778B21 /* TADelegateInterceptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TADelegateInterceptor.m; path = ../../TAFetchedResultsController/TADelegateInterceptor.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		2273D23F1592065E00778B21 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2273D2471592065E00778B21 /* UIKit.framework in Frameworks */,
+				2273D2491592065E00778B21 /* Foundation.framework in Frameworks */,
+				2273D24B1592065E00778B21 /* CoreGraphics.framework in Frameworks */,
+				2273D24D1592065E00778B21 /* CoreData.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2273D2371592065E00778B21 = {
+			isa = PBXGroup;
+			children = (
+				2273D24E1592065E00778B21 /* TAFetchedResultsControllerDemo */,
+				2273D27715920F1600778B21 /* TAFetchedResultsController */,
+				2273D2451592065E00778B21 /* Frameworks */,
+				2273D2431592065E00778B21 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		2273D2431592065E00778B21 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2273D2421592065E00778B21 /* TAFetchedResultsControllerDemo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2273D2451592065E00778B21 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2273D2461592065E00778B21 /* UIKit.framework */,
+				2273D2481592065E00778B21 /* Foundation.framework */,
+				2273D24A1592065E00778B21 /* CoreGraphics.framework */,
+				2273D24C1592065E00778B21 /* CoreData.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		2273D24E1592065E00778B21 /* TAFetchedResultsControllerDemo */ = {
+			isa = PBXGroup;
+			children = (
+				2273D2571592065E00778B21 /* AppDelegate.h */,
+				2273D2581592065E00778B21 /* AppDelegate.m */,
+				2273D2601592065E00778B21 /* DemoViewController.h */,
+				2273D2611592065E00778B21 /* DemoViewController.m */,
+				2273D2661592065E00778B21 /* DemoViewController.xib */,
+				2273D27B159254FE00778B21 /* Core Data */,
+				2273D24F1592065E00778B21 /* Supporting Files */,
+			);
+			path = TAFetchedResultsControllerDemo;
+			sourceTree = "<group>";
+		};
+		2273D24F1592065E00778B21 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				2273D2501592065E00778B21 /* TAFetchedResultsControllerDemo-Info.plist */,
+				2273D2511592065E00778B21 /* InfoPlist.strings */,
+				2273D2541592065E00778B21 /* main.m */,
+				2273D2561592065E00778B21 /* TAFetchedResultsControllerDemo-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		2273D27715920F1600778B21 /* TAFetchedResultsController */ = {
+			isa = PBXGroup;
+			children = (
+				2273D27815920FA800778B21 /* TADelegateInterceptor.h */,
+				2273D27915920FA800778B21 /* TADelegateInterceptor.m */,
+				2273D27415920F0A00778B21 /* TAFetchedResultsController.h */,
+				2273D27515920F0A00778B21 /* TAFetchedResultsController.m */,
+			);
+			name = TAFetchedResultsController;
+			path = TAFetchedResultsControllerDemo;
+			sourceTree = "<group>";
+		};
+		2273D27B159254FE00778B21 /* Core Data */ = {
+			isa = PBXGroup;
+			children = (
+				2273D25A1592065E00778B21 /* TAFetchedResultsControllerDemo.xcdatamodeld */,
+				2273D271159209E900778B21 /* Section.h */,
+				2273D272159209E900778B21 /* Section.m */,
+				2273D26E159209E900778B21 /* Item.h */,
+				2273D26F159209E900778B21 /* Item.m */,
+			);
+			name = "Core Data";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		2273D2411592065E00778B21 /* TAFetchedResultsControllerDemo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2273D26B1592065E00778B21 /* Build configuration list for PBXNativeTarget "TAFetchedResultsControllerDemo" */;
+			buildPhases = (
+				2273D23E1592065E00778B21 /* Sources */,
+				2273D23F1592065E00778B21 /* Frameworks */,
+				2273D2401592065E00778B21 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TAFetchedResultsControllerDemo;
+			productName = TAFetchedResultsControllerDemo;
+			productReference = 2273D2421592065E00778B21 /* TAFetchedResultsControllerDemo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		2273D2391592065E00778B21 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0430;
+			};
+			buildConfigurationList = 2273D23C1592065E00778B21 /* Build configuration list for PBXProject "TAFetchedResultsControllerDemo" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 2273D2371592065E00778B21;
+			productRefGroup = 2273D2431592065E00778B21 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				2273D2411592065E00778B21 /* TAFetchedResultsControllerDemo */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		2273D2401592065E00778B21 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2273D2531592065E00778B21 /* InfoPlist.strings in Resources */,
+				2273D2681592065E00778B21 /* DemoViewController.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2273D23E1592065E00778B21 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2273D2551592065E00778B21 /* main.m in Sources */,
+				2273D2591592065E00778B21 /* AppDelegate.m in Sources */,
+				2273D25C1592065E00778B21 /* TAFetchedResultsControllerDemo.xcdatamodeld in Sources */,
+				2273D2621592065E00778B21 /* DemoViewController.m in Sources */,
+				2273D270159209E900778B21 /* Item.m in Sources */,
+				2273D273159209E900778B21 /* Section.m in Sources */,
+				2273D27615920F0A00778B21 /* TAFetchedResultsController.m in Sources */,
+				2273D27A15920FA800778B21 /* TADelegateInterceptor.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		2273D2511592065E00778B21 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				2273D2521592065E00778B21 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		2273D2661592065E00778B21 /* DemoViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				2273D2671592065E00778B21 /* en */,
+			);
+			name = DemoViewController.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		2273D2691592065E00778B21 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		2273D26A1592065E00778B21 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		2273D26C1592065E00778B21 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TAFetchedResultsControllerDemo/TAFetchedResultsControllerDemo-Prefix.pch";
+				INFOPLIST_FILE = "TAFetchedResultsControllerDemo/TAFetchedResultsControllerDemo-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		2273D26D1592065E00778B21 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TAFetchedResultsControllerDemo/TAFetchedResultsControllerDemo-Prefix.pch";
+				INFOPLIST_FILE = "TAFetchedResultsControllerDemo/TAFetchedResultsControllerDemo-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2273D23C1592065E00778B21 /* Build configuration list for PBXProject "TAFetchedResultsControllerDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2273D2691592065E00778B21 /* Debug */,
+				2273D26A1592065E00778B21 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2273D26B1592065E00778B21 /* Build configuration list for PBXNativeTarget "TAFetchedResultsControllerDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2273D26C1592065E00778B21 /* Debug */,
+				2273D26D1592065E00778B21 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		2273D25A1592065E00778B21 /* TAFetchedResultsControllerDemo.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				2273D25B1592065E00778B21 /* TAFetchedResultsControllerDemo.xcdatamodel */,
+			);
+			currentVersion = 2273D25B1592065E00778B21 /* TAFetchedResultsControllerDemo.xcdatamodel */;
+			path = TAFetchedResultsControllerDemo.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 2273D2391592065E00778B21 /* Project object */;
+}
