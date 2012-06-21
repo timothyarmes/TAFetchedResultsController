@@ -9,7 +9,7 @@
 #import "TAFetchedResultsController.h"
 #import "TADelegateInterceptor.h"
 
-#define DEBUG_TAFETCHEDRESULTSCONTROLLER 0
+#define DEBUG_TAFETCHEDRESULTSCONTROLLER 1
 
 #if DEBUG_TAFETCHEDRESULTSCONTROLLER
 #   define NSLog(...) NSLog(__VA_ARGS__);
@@ -61,19 +61,14 @@
     if (self)
     {
         _theManagedObject = managedObject;
+        
     }
     
     return self;
 }
 
 - (NSString *)name
-{
-    // Ask the user for a name
-    
-    if ([(NSObject *)resultsController.delegate respondsToSelector:@selector(controller:sectionNameForObject:)]) {
-        return [resultsController.delegate controller:resultsController sectionNameForObject:_theManagedObject];
-    }
-    
+{    
     // Return the grouping name by default
     
     return (NSString *)[_theManagedObject valueForKey:resultsController.propertyNameForSectionGrouping];
@@ -142,9 +137,19 @@
         self.delegateInterceptor = [[TADelegateInterceptor alloc] init];
         [_delegateInterceptor setMiddleMan:self];
         [super setDelegate:(id)_delegateInterceptor];
+
+        // We need to watch for model changes to the sections 
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDataModelChange:) name:NSManagedObjectContextObjectsDidChangeNotification object:context];
     }
     
     return self;
+}
+
+- (void)dealloc
+{
+    // Remove our observer
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark - Section mapping
@@ -201,7 +206,7 @@
             
             // Find the corresponding section
             // NSFetchedResultsController only returns us the "name" as supplied by the "sectionNameKeyPath". This name
-            // is normally use to both group and order the sections; it must be unique for each section. We can therefore
+            // is normally used to both group and order the sections; it must be unique for each section. We can therefore
             // use this to locate the actual section entity. The order of the section array can be totally different to that
             // returned by NSFetchedResultsController :)
             
@@ -318,8 +323,8 @@
     // This will be called if a row has been moved to a new section or if the last row has been deleted from a section
     //
     // This will cause the indexPath passed to didChangeObject to become out of sync. If we update the mapping now then
-    // the deleted section will no longer be mapped and didChangeObject: won't be able to find the correspinding section
-    // in the table (traditionally it would have been delete from the table view at this point.
+    // the deleted section will no longer be mapped and didChangeObject: won't be able to find the corresponding section
+    // in the table (traditionally it would have been deleted from the table view at this point.
     // If we delay the remapping then we won't have a mapping for the the newly created section.
     //
     // We need to hold onto the old mapping (with the deleted section), remap, then use the appropriate table!
@@ -359,13 +364,13 @@
         NSIndexPath *convertedNewIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
         
         if (type != NSFetchedResultsChangeInsert) {
-            // The indexPath must exists - convert it...
+            // The indexPath must exist - convert it...
             convertedIndexPath = [self convertNSFetchedResultsSectionIndexToUITableViewControllerSectionIndex:indexPath usingMapping:prevMapping];
             NSLog(@"Converted indexPath from [%d, %d] to [%d, %d]", indexPath.section, indexPath.row, convertedIndexPath.section, convertedIndexPath.row);
         }
         
         if (type == NSFetchedResultsChangeMove || type == NSFetchedResultsChangeInsert) {
-            // newIndexPath must exists - convert it...
+            // newIndexPath must exist - convert it...
             convertedNewIndexPath = [self convertNSFetchedResultsSectionIndexToUITableViewControllerSectionIndex:newIndexPath usingMapping:_allSections];
             NSLog(@"Converted newIndexPath from [%d, %d] to [%d, %d]", newIndexPath.section, newIndexPath.row, convertedNewIndexPath.section, convertedNewIndexPath.row);
         }
@@ -393,5 +398,77 @@
     }
 }
 
+#pragma mark - Model Change Handling
+
+- (void)handleDataModelChange:(NSNotification *)notification;
+{
+    NSSet *updatedObjects  = [[notification userInfo] objectForKey:NSUpdatedObjectsKey];
+    NSSet *deletedObjects  = [[notification userInfo] objectForKey:NSDeletedObjectsKey];
+    NSSet *insertedObjects = [[notification userInfo] objectForKey:NSInsertedObjectsKey];
+    
+    // We only care about changes to the Entity used for the sections
+    
+    NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
+        NSManagedObject *mo = (NSManagedObject *)evaluatedObject;
+        return [mo.entity isKindOfEntity:[self.sectionFetchRequest entity]];
+    }];
+     
+    updatedObjects  = [updatedObjects  filteredSetUsingPredicate:predicate];
+    deletedObjects  = [deletedObjects  filteredSetUsingPredicate:predicate];
+    insertedObjects = [insertedObjects filteredSetUsingPredicate:predicate];
+ 
+    // If our fetch request isn't affected by the change then we return....
+    
+    if ([updatedObjects count] + [deletedObjects count] + [insertedObjects count] == 0)
+        return;
+    
+    NSLog(@"Section changes detected, %d deleted, %d inserted, %d updated", [deletedObjects count], [insertedObjects count], [updatedObjects count]);
+    
+    // Tell the delegate that we're about to make changes
+    
+    if ([(NSObject *)_delegateInterceptor.receiver respondsToSelector:@selector(controllerWillChangeContent:)]) {
+        [_delegateInterceptor.receiver controllerWillChangeContent:self];
+    }
+    
+    // Go through the list of changes to send
+    
+    if ([(NSObject *)_delegateInterceptor.receiver respondsToSelector:@selector(controller:didChangeSection:atIndex:forChangeType:)]) {
+        
+        // Tell the delegate about any deleted rows
+        
+        NSUInteger idx = 0;
+        for (TASectionInfo *si in _allSections) {
+            if ([deletedObjects containsObject:si.theManagedObject]) {
+                [_delegateInterceptor.receiver controller:self didChangeSection:si atIndex:idx forChangeType:NSFetchedResultsChangeDelete];
+            }
+            idx++;
+        }
+        
+        // Re-fetch the sections list (without the deleted sections) and update us internally
+        //
+        // Once we've done this the indexes of the sections will be correct for the sections to be inserted and modified
+        
+        [self updateSections];
+        
+        idx = 0;
+        for (TASectionInfo *si in _allSections) {
+            
+            if ([updatedObjects containsObject:si.theManagedObject]) {
+                [_delegateInterceptor.receiver controller:self didChangeSection:si atIndex:idx forChangeType:NSFetchedResultsChangeUpdate];
+            }
+            
+            if ([insertedObjects containsObject:si.theManagedObject]) {
+                [_delegateInterceptor.receiver controller:self didChangeSection:si atIndex:idx forChangeType:NSFetchedResultsChangeInsert];
+            }
+            idx++;
+        }
+    }
+    
+    // Tell the delegate that we've finished making changes
+    
+    if ([(NSObject *)_delegateInterceptor.receiver respondsToSelector:@selector(controllerDidChangeContent:)]) {
+        [_delegateInterceptor.receiver controllerDidChangeContent:self];
+    }
+}
 
 @end

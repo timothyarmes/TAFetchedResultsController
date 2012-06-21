@@ -2,7 +2,7 @@
 //  Section.m
 //  TAFetchedResultsControllerDemo
 //
-//  Created by Timothy Armes on 20/06/2012.
+//  Created by Timothy Armes on 21/06/2012.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
@@ -14,6 +14,7 @@
 
 @dynamic name;
 @dynamic timeStamp;
+@dynamic uuid;
 @dynamic items;
 
 @end

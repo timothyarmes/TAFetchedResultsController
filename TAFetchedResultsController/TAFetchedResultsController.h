@@ -18,21 +18,12 @@
 
 @end
 
-// Extend the NSFetchedResultsControllerDelegate protocol to to give the caller the chance to choose the section name
-
-@protocol TAFetchedResultsControllerDelegate <NSFetchedResultsControllerDelegate>
-
-@optional
-- (NSString *)controller:(NSFetchedResultsController *)controller sectionNameForObject:(NSManagedObject *)sectionObject;
-
-@end
-
 // Subclass NSFetchedResultsController
 
 @interface TAFetchedResultsController : NSFetchedResultsController <NSFetchedResultsControllerDelegate>
 
 @property (strong, nonatomic) NSArray *allSections;
-@property (weak, nonatomic) id <TAFetchedResultsControllerDelegate> delegate;
+@property (weak, nonatomic) id <NSFetchedResultsControllerDelegate> delegate;
 
 /* Initializes an instance of TAFetchedResultsController
  

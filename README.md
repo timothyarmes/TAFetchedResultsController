@@ -3,33 +3,37 @@ TAFetchedResultsController
 
 TAFetchedResultsController is a subclass of NSFetchedResultsController that allows for empty sections.
 
-**IMPORTANT NOTE:** This project's advanceing very well, but it's not quote yet ready for use. See the limitations described in this document. Please feel free to help the advancement!
-
 ## NSFetchedResultsController limitations
 
-NSFetchedResultsController is a fantastic class, it allows you to map a core data entity to a UITablView, and keeps them in sync with each other through the use of delegate calls.
+NSFetchedResultsController is a fantastic class, it allows you to map a core data entity to a UITableView, and keeps them in sync with each other through the use of delegate calls.
 
 However, NSFetchedResultsController's support for sections is limited. While it is possible to divide the fetch results into sections, there are some severe limitations:
 
 * You can't have empty sections.
 * The ordering of the sections is based on the name that you wish to display in the section header. It's hard to separate the two without resorting to some very nasty techniques.
-* There's no easy way to recover the section object (assuming that the keypath for section grouping points to another entity) other than searching for it by title.
+* There's no easy way to recover the section object (assuming that the keypath for section grouping points to another entity) other than searching for it by name.
 
 ## TAFetchedResultsController
 
 TAFetchedResultsController is a subclass of NSFetchedResultsController that solves the above problems. It's *almost* a drop in replacement, but there are a few differences.
 
-If you don't know how to use NSFetchedResultsController then read about that first in Apple's documentation. This readme file will assume that you understand how to use it.
+If you don't know how to use NSFetchedResultsController then you should first read about that first in Apple's documentation. This document will assume that you understand how to use it.
+
+## Core Data Model Requirements
 
 Whereas NSFetchedResultsController manages one Entity (the items), TAFetchedResultsController manages two: the items and the sections. It is therefore necessary to have an Entity to manage the sections as well as the one for the items. The Sections entity will have a one-to-many relationship to the items that it contains. You'll also need a relationship back again.
 
-### Initialisation
+The delete rule for the items relationship should be set to *cascade*. This will ensure that when you delete a section the items will be deleted first and thus removed from the table. This author hasn't tried using any other delete rule and has no idea what the consequences would be (if any).
 
-The initialisation of a TAFetchedResultsController is very similar to that of an NSFetchResultsController, however we create a second fetch request for the sections. In general, you should:
+Section Entities need to have a unique and unchanging string key be which they can be identified. This property should be used when suppying a key path name to group the items into sections.
 
-* Create a fetch request for the items
+## Initialisation
+
+The initialisation of a TAFetchedResultsController is very similar to that of an NSFetchResultsController, however you must create a second fetch request for the sections. In general, you should:
+
+* Create a fetch request for the items.
 * Ensure that the items are grouped first by section using the keypath to access an unique identifier on the section Entity. (NSFetchResultsController also require this, although you're force to group using the property that will also be used for the section name).
-* Create a fetch request for the sections
+* Create a fetch request for the sections.
 * Sort them any way you please (this will be the order they appear in the table).
 * Create the TAFetchedResultsController passing in these two fetch requests and the key path from the Item's entity to the property in the Section's entity that you're using to uniquely identify it.
 
@@ -104,7 +108,7 @@ The initialisation of a TAFetchedResultsController is very similar to that of an
 
 ## Using TAFetchedResultsSectionInfo
 
-TAFetchedResultsSectionInfo is used is much the same way as NSFetchedResultsSectionInfo. You should respond to the same callback to update your table, and you should ask it for information about your sections and cells in your table's datasource methods.
+TAFetchedResultsSectionInfo is used is much the same way as NSFetchedResultsSectionInfo. You should respond to the same callbacks to update your table, and you should ask it for information about your sections and cells in your table's datasource methods.
 
 The big gotcha is that you should **always** use the *allSections* method to get a list of the sections. The *sections* method will return the list from the underlying base class, and will therefore be incomplete (missing as it will the empty sections).
 
@@ -118,28 +122,26 @@ For example:
         return [sectionInfo numberOfObjects];
     }
 
-## TAFetchedResultsControllerDelegate
- 
-TAFetchedResultsControllerDelegate is subclass of NSFetchedResultsControllerDelegate that adds one extra callback:
- 
-    - (NSString *)controller:(NSFetchedResultsController *)controller sectionNameForObject:(NSManagedObject *)sectionObject;
-
-Implement this to return the section's name for the UITableView. Note that you're passed the underlying object - how handy :)
-
 ## TAFetchedResultsSectionInfo
 
-TAFetchedResultsSectionInfo is a subclass of NSFetchedResultsSectionInfo. An array of TAFetchedResultsSectionInfos are passed back to you when you call allSection on the controller. The big difference is that you have access to the NSManagedObject for the section
+TAFetchedResultsSectionInfo is a subclass of NSFetchedResultsSectionInfo. An array of TAFetchedResultsSectionInfos are passed back to you when you call allSections on the controller. The key difference is that you have access to the NSManagedObject for the section.
 
     @property (nonatomic, readonly) NSManagedObject *theManagedObject;
 
+Having the object is a very useful thing to have! Now you can easily access all the fields in order to return a sensible section name (unlike for NSFeetchedResultsController!)
 
+## Responding to section changes
+
+TAFetchedResultsController listens to context changes that will affect your sections (such as the insertion and deletion of sections) and calls your delegate to inform your to update your table.
+
+Notice that unlike NSFetchedResultsController you will also be informed if a section is updated. This may be useful if the section's titel can be changed at any time.
 
 How it works
 ============
 
 TAFetchedResultsController still gives NSFetchedResultsController all the hard work to do. This is a good thing because it's a complex class and I'd rather get Apple's engineers to maintain it :)
 
-The section indexes returned by NSFetchedResultsController only exist for sections which contain items. For example, image that we have an entity called section which contains items. A hierarchy might look like this:
+The section indexes returned by NSFetchedResultsController only exist for sections which contain items. For example, imagine that we have an entity called section which contains items. A hierarchy might look like this (the numbers are the indexes of an ordered fetch request on the sections):
 
     Section A (0)
        - Item x
@@ -148,14 +150,12 @@ The section indexes returned by NSFetchedResultsController only exist for sectio
     Section C (2)
        - Item z
 
-The numbers are the indexes of an ordered fetch request on the sections.
-
 NSFetchedResultsController would have returned as the following sections:
 
     Section A (0)
     Section C (1)
     
-Section B would not have been returned since it contained no rows. At this point we have a problem - the index of the list of all the sections no longer match the indexes of the sections returned by NSFetchedResultsController.
+Section B would not have been returned since it contained no rows. At this point we have a problem - the indexes in the list of all the sections no longer match the indexes of the sections returned by NSFetchedResultsController.
 
 TAFetchedResultsController solves this problem by maintaining a mapping between the real indexes and those returned by NSFetchedResultsController. Furthermore, TAFetchedResultsController intercepts the delegate calls from NSFetchedResultsController and converts the NSIndexPaths to make all this transparent.
 
@@ -163,17 +163,14 @@ TAFetchedResultsController solves this problem by maintaining a mapping between 
 Known Limitations
 =================
 
-## Changes to the list of sections are not yet detected
+## Section moves are not net tracked
 
-NSFetchedResultsController provides a callback for when new sections are created and deleted:
+TAFetchedResultsController will reponds to changes in your Section objects and call you back to insert, delete or update sections aas required.
 
-    - (void)controller:(NSFetchedResultsController *)controller didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type
+However, changes to section order are not yet handled, and the behaviour is currently undefined should you do this.
 
-Under NSFetchedResultsController a section would suddenly appear when a row was assigned to it. It would disappear when the last row was removed.
-
-TAFetchedResultsController is different in that the list of sections is provided by a model entity for which you provide a fetch request. However, it doesn't *yet* listen to changes within the Section Entity. This means that you won't currently receive any calls to the above callback.
-
-You'll need to handle this yourself until this has been done…
+Gotchas
+=======
 
 ## Using [self.taFetchedResultsController sections] will get you in trouble
 

@@ -15,7 +15,10 @@
 
 @property (weak, nonatomic) Section *mostRecentlyCreatedSection;
 @property (strong, nonatomic) TAFetchedResultsController *taFetchedResultsController;
+@property (strong, nonatomic) NSMutableArray *buttonIndexMapping;
+@property (strong, nonatomic) UIButton *dummyView;
 @property (nonatomic) BOOL inManualReorder;
+@property (nonatomic) BOOL sectionsDeletionsPending;
 
 - (void)configureView;
 
@@ -26,8 +29,11 @@
 @synthesize tableView = _tableView;
 @synthesize managedObjectContext = _managedObjectContext;
 @synthesize taFetchedResultsController = _taFetchedResultsController;
+@synthesize buttonIndexMapping = _buttonIndexMapping;
+@synthesize dummyView = _dummyView;
 @synthesize mostRecentlyCreatedSection = _mostRecentlyCreatedSection;
 @synthesize inManualReorder = _inManualReorder;
+@synthesize sectionsDeletionsPending = _sectionsDeletionsPending;
 
 #pragma mark - Managing the detail item
 
@@ -50,6 +56,10 @@
     self.tableView.dataSource = self;
     
     self.navigationItem.leftBarButtonItem = self.editButtonItem;
+    
+    self.buttonIndexMapping = [[NSMutableArray alloc] initWithCapacity:20];
+    self.dummyView = [[UIButton alloc] init];
+    self.sectionsDeletionsPending = NO;
     
     [self configureView];
 }
@@ -120,6 +130,61 @@
     return cell;
 }
 
+// Customize the appearence of the header sections 
+
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    // Create the parent view that will hold header's label
+    
+    UIView* customView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, 44.0)];
+    customView.backgroundColor = [UIColor grayColor];
+    
+    // Create a text label
+    
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, tableView.bounds.size.width - 60 - 60 - 10, 44.0)];
+    label.text = [tableView.dataSource tableView:tableView titleForHeaderInSection:section];
+    label.backgroundColor = [UIColor clearColor];
+    label.font = [UIFont boldSystemFontOfSize:14];
+    label.textColor = [UIColor whiteColor];
+    [customView addSubview:label];
+    
+    // Create the delete button object
+    
+    UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(tableView.bounds.size.width - 60, 6, 50, 30.0)];
+    button.backgroundColor = [UIColor redColor];
+    button.opaque = YES;
+    button.titleLabel.font = [UIFont boldSystemFontOfSize:12];
+    [button setTitle:@"Delete" forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(deleteSection:) forControlEvents:UIControlEventTouchUpInside];
+    [customView addSubview:button];
+    
+    // Create the update button object
+    
+    button = [[UIButton alloc] initWithFrame:CGRectMake(tableView.bounds.size.width - 60 - 60, 6, 50, 30.0)];
+    button.backgroundColor = [UIColor blueColor];
+    button.opaque = YES;
+    button.titleLabel.font = [UIFont boldSystemFontOfSize:12];
+    [button setTitle:@"Update" forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(updateSection:) forControlEvents:UIControlEventTouchUpInside];
+    [customView addSubview:button];
+
+    // Store this button in the mapping array - first make sure that we have an object to replace
+    
+    while ([self.buttonIndexMapping count] <= section)
+        [self.buttonIndexMapping addObject:_dummyView];
+    
+    // Now replace the object at that index
+    
+    [self.buttonIndexMapping replaceObjectAtIndex:section withObject:customView];
+    
+    return customView;
+}
+
+- (CGFloat) tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 44.0;
+}
+
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // Return NO if you do not want the specified item to be editable.
@@ -157,7 +222,7 @@
 - (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath
 {
     // In this demo we allow rows to be moved, but only between sections. Order within a section is always alphabetical....
-        
+    
     // If the sections are the same, don't allow the move since it's already in order
     
     if (sourceIndexPath.section == proposedDestinationIndexPath.section)
@@ -188,14 +253,14 @@
     Item *item = [self itemAtIndexPath:fromIndexPath];
     id <TAFetchedResultsSectionInfo> sectionInfo = [[self.taFetchedResultsController allSections] objectAtIndex:toIndexPath.section];
     Section *newSection = (Section *)sectionInfo.theManagedObject;
-
+    
     // Assign the item to the new section
     
     if (item.section != newSection)
         item.section = newSection;
     
     // Save the managed context
-
+    
     NSError *error = nil;
     if (![self.managedObjectContext save:&error]) {
         // Replace this implementation with code to handle the error appropriately.
@@ -215,7 +280,8 @@
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
     id <TAFetchedResultsSectionInfo> sectionInfo = [[self.taFetchedResultsController allSections] objectAtIndex:section];
-    return sectionInfo.name;
+    Section *sectionObject = (Section *)sectionInfo.theManagedObject;
+    return sectionObject.name;
 }
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath
@@ -225,6 +291,28 @@
 }   
 
 #pragma mark - Fetched results controller
+
+- (void)updateButtonMapping
+{
+    if (self.sectionsDeletionsPending)
+    {
+        NSMutableArray *newMapping = [NSMutableArray arrayWithCapacity:[[self.taFetchedResultsController allSections] count]];
+        
+        // Add non null object to our new array
+        
+        for (id obj in self.buttonIndexMapping) {
+            if (![obj isKindOfClass:[NSNull class]]) {
+                [newMapping addObject:obj];
+            }
+        }
+        
+        // Use the new array from now on
+        
+        self.buttonIndexMapping = newMapping;
+    }
+    
+    self.sectionsDeletionsPending = NO;
+}
 
 - (TAFetchedResultsController *)taFetchedResultsController
 {
@@ -249,7 +337,7 @@
     //
     // We then order the items alphabetically by name within each section
     
-    NSSortDescriptor *groupingDescriptor = [[NSSortDescriptor alloc] initWithKey:@"section.name" ascending:YES];
+    NSSortDescriptor *groupingDescriptor = [[NSSortDescriptor alloc] initWithKey:@"section.uuid" ascending:YES];
     NSSortDescriptor *nameDescriptor = [[NSSortDescriptor alloc] initWithKey:@"name" ascending:YES];
     NSArray *sortDescriptors = [NSArray arrayWithObjects:groupingDescriptor, nameDescriptor, nil];
     
@@ -263,7 +351,7 @@
     
     // For this demo, we order by timestamp
     //
-    // Note that unlike for NSFetchedResultsController, TAFetchedResultsController allows use to arbitrarily order the sections.
+    // Note that unlike for NSFetchedResultsController, TAFetchedResultsController allows us to arbitrarily order the sections.
     
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"timeStamp" ascending:YES];
     [sectionFetchRequest setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
@@ -273,7 +361,7 @@
     TAFetchedResultsController *taFetchedResultsController = [[TAFetchedResultsController alloc] initWithItemFetchRequest:itemFetchRequest
                                                                                                       sectionFetchRequest:sectionFetchRequest
                                                                                                      managedObjectContext:self.managedObjectContext
-                                                                                                   sectionGroupingKeyPath:@"section.name"
+                                                                                                   sectionGroupingKeyPath:@"section.uuid"
                                                                                                                 cacheName:nil];
     
     // We want to respond to model changes
@@ -282,13 +370,13 @@
     
     self.taFetchedResultsController = taFetchedResultsController;
     
-	NSError *error = nil;
-	if (![self.taFetchedResultsController performFetch:&error]) {
+    NSError *error = nil;
+    if (![self.taFetchedResultsController performFetch:&error]) {
         // Replace this implementation with code to handle the error appropriately.
         // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. 
-	    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-	    abort();
-	}
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        abort();
+    }
     
     return _taFetchedResultsController;
 }    
@@ -296,25 +384,65 @@
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller
 {
     if (!self.inManualReorder)
+    {
+        NSLog(@"Beginning table updates");
         [self.tableView beginUpdates];
+    }
 }
 
-- (void)controller:(NSFetchedResultsController *)controller didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo
-           atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type
-{
-    // This isn't yet handled by TAFetchedResultsController
+- (void)controller:(NSFetchedResultsController *)controller
+  didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo
+           atIndex:(NSUInteger)sectionIndex
+     forChangeType:(NSFetchedResultsChangeType)type
+{ 
+    // We get these notifications when changes are made to the context concerning the Entity used for sections.
     //
-    // Until then, the table should be reloaded manually whenever the sections change...
+    // Note that we get all the deletions first...
     
-    /*
-     switch(type) {
-     case NSFetchedResultsChangeInsert:
-     break;
-     
-     case NSFetchedResultsChangeDelete:
-     break;
-     }
-     */
+    switch(type) {
+            
+        case NSFetchedResultsChangeDelete:
+            
+            NSLog(@"TAFetchResultsController requesting SECTION DELETE at index %d]", sectionIndex);
+            [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
+            
+            // This section's been deleted, so the button will be removed.
+            //
+            // We can't just deleted it from the mapping because any future calls to NSFetchedResultsChangeDelete are based on the indexes at the 
+            // start of this set of deleted. We mark the deletion and rember that we have to remap later
+            
+            [self.buttonIndexMapping replaceObjectAtIndex:sectionIndex withObject:[NSNull null]];
+            self.sectionsDeletionsPending = YES;
+            
+            break;
+
+        case NSFetchedResultsChangeInsert:
+            
+            NSLog(@"TAFetchResultsController requesting SECTION INSERT at index %d]", sectionIndex);
+            
+            // If we have already deleted sections then we need to remove them from the mapping. If we don't do this then the 
+            // indexes in the mapping array will not match those passed in here.
+            
+            [self updateButtonMapping];
+
+            // Insert the row
+            
+            [self.tableView insertSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
+            
+            // Stick a dummy object in our mapping array - it'll be updated when UITableView calls back to get the header view.
+            // We don't pass in a NSNull since that's what we do to mark deleted rows...
+            
+            [self.buttonIndexMapping insertObject:_dummyView atIndex:sectionIndex];
+            
+            break;
+
+        case NSFetchedResultsChangeUpdate:
+            
+            NSLog(@"TAFetchResultsController requesting SECTION UPDATE at index %d]", sectionIndex);
+            [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
+            
+            break;
+    }
 }
 
 - (void)controller:(NSFetchedResultsController *)controller
@@ -331,22 +459,22 @@
     {
         switch(type) {
             case NSFetchedResultsChangeInsert:
-                NSLog(@"TAFetchResultsController requesting INSERT at [%d, %d]", newIndexPath.section, newIndexPath.row);
+                NSLog(@"TAFetchResultsController requesting OBJECT INSERT at [%d, %d]", newIndexPath.section, newIndexPath.row);
                 [tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
                 break;
                 
             case NSFetchedResultsChangeDelete:
-                NSLog(@"TAFetchResultsController requesting DELETE to [%d, %d]", indexPath.section, indexPath.row);
+                NSLog(@"TAFetchResultsController requesting OBJECT DELETE to [%d, %d]", indexPath.section, indexPath.row);
                 [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
                 break;
                 
             case NSFetchedResultsChangeUpdate:
-                NSLog(@"TAFetchResultsController requesting UPDATE to [%d, %d]", indexPath.section, indexPath.row);
+                NSLog(@"TAFetchResultsController requesting OBJECT UPDATE to [%d, %d]", indexPath.section, indexPath.row);
                 [self configureCell:[tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
                 break;
                 
             case NSFetchedResultsChangeMove:
-                NSLog(@"TAFetchResultsController requesting MOVE from [%d, %d] to [%d, %d]", indexPath.section, indexPath.row, newIndexPath.section, newIndexPath.row);
+                NSLog(@"TAFetchResultsController requesting OBJECT MOVE from [%d, %d] to [%d, %d]", indexPath.section, indexPath.row, newIndexPath.section, newIndexPath.row);
                 NSLog(@"Updating table MOVE request");
                 [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
                 [tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath]withRowAnimation:UITableViewRowAnimationFade];
@@ -358,10 +486,19 @@
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
 {
     if (!self.inManualReorder)
+    {
+        NSLog(@"Ending table updates");
         [self.tableView endUpdates];
+    }
+    
+    // In there were any sections deleted during the update then this would have been noted in the button mapping. Now that's done we should
+    // actually remove the nullified objects.
+
+    [self updateButtonMapping];
+    
 }
 
-#pragma mark - Button handling
+#pragma mark - Button handling (used for testing the app)
 
 - (IBAction)addNewSection:(id)sender {
     
@@ -370,6 +507,12 @@
     
     newSection.name = [NSString stringWithFormat:@"Section %d", [[self.taFetchedResultsController allSections] count] + 1];
     newSection.timeStamp = [NSDate date];
+    
+    // Create a unique and unchanging UUID for this sections
+    
+    CFUUIDRef newUniqueId = CFUUIDCreate(kCFAllocatorDefault);
+    newSection.uuid = (__bridge_transfer NSString*)CFUUIDCreateString(kCFAllocatorDefault, newUniqueId);
+    CFRelease(newUniqueId);
     
     // Save the context.
     NSError *error = nil;
@@ -382,9 +525,7 @@
     
     self.mostRecentlyCreatedSection = newSection;
     
-    [self.taFetchedResultsController updateSections]; // This should be automatic in the final release
-    
-    [self.tableView reloadData];
+    // Note: TAFetchedResultsController will call back to update the UITableView
 }
 
 - (IBAction)addNewItem:(id)sender {
@@ -424,4 +565,62 @@
     
     // Note: TAFetchedResultsController will call back to update the UITableView
 }
+
+- (void)deleteSection:(UIButton *)button {
+    
+    // Delete the section from the object model.
+    // 
+    // TAFetchedResultsController will detect the change and call back to update the table....
+    
+    // We get the index of of our button by searching our array
+    
+    NSUInteger index = [self.buttonIndexMapping indexOfObject:button.superview];
+    if (index == NSNotFound)
+    {
+        NSLog(@"Unable to find index of section from button object. Oops");
+        abort();
+    }
+    
+    id <TAFetchedResultsSectionInfo> si = [[self.taFetchedResultsController allSections] objectAtIndex:index];
+    [self.managedObjectContext  deleteObject:si.theManagedObject];
+    
+    // Save the context
+    
+    NSError *error = nil;
+    if (![self.managedObjectContext save:&error]) {
+        // Replace this implementation with code to handle the error appropriately.
+        // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. 
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        abort();
+    }
+}
+
+- (void)updateSection:(UIButton *)button {
+    
+    // Update the button's name just to show that TAFetchedResultsController can detect changes and pass them on
+    
+    // We get the index of of our button by searching our array
+    
+    NSUInteger index = [self.buttonIndexMapping indexOfObject:button.superview];
+    if (index == NSNotFound)
+    {
+        NSLog(@"Unable to find index of section from button object. Oops");
+        abort();
+    }
+    
+    id <TAFetchedResultsSectionInfo> si = [[self.taFetchedResultsController allSections] objectAtIndex:index];
+    Section *section = (Section *)si.theManagedObject;
+    section.name = @"Updated!";
+    
+    // Save the context
+    
+    NSError *error = nil;
+    if (![self.managedObjectContext save:&error]) {
+        // Replace this implementation with code to handle the error appropriately.
+        // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. 
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        abort();
+    }
+}
+
 @end

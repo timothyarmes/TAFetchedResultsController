@@ -2,7 +2,7 @@
 //  Section.h
 //  TAFetchedResultsControllerDemo
 //
-//  Created by Timothy Armes on 20/06/2012.
+//  Created by Timothy Armes on 21/06/2012.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
@@ -15,6 +15,7 @@
 
 @property (nonatomic, retain) NSString * name;
 @property (nonatomic, retain) NSDate * timeStamp;
+@property (nonatomic, retain) NSString * uuid;
 @property (nonatomic, retain) NSSet *items;
 @end
 
