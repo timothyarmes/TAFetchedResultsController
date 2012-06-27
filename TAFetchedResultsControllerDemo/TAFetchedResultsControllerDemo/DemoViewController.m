@@ -11,11 +11,13 @@
 #import "Section.h"
 #import "Item.h"
 
+#define kLabelTag 1000
+
 @interface DemoViewController ()
 
 @property (weak, nonatomic) Section *mostRecentlyCreatedSection;
 @property (strong, nonatomic) TAFetchedResultsController *taFetchedResultsController;
-@property (strong, nonatomic) NSMutableArray *buttonIndexMapping;
+@property (strong, nonatomic) NSMutableArray *sectionViewIndexMapping;
 @property (strong, nonatomic) UIButton *dummyView;
 @property (nonatomic) BOOL inManualReorder;
 @property (nonatomic) BOOL sectionsDeletionsPending;
@@ -29,7 +31,7 @@
 @synthesize tableView = _tableView;
 @synthesize managedObjectContext = _managedObjectContext;
 @synthesize taFetchedResultsController = _taFetchedResultsController;
-@synthesize buttonIndexMapping = _buttonIndexMapping;
+@synthesize sectionViewIndexMapping = _buttonIndexMapping;
 @synthesize dummyView = _dummyView;
 @synthesize mostRecentlyCreatedSection = _mostRecentlyCreatedSection;
 @synthesize inManualReorder = _inManualReorder;
@@ -57,7 +59,7 @@
     
     self.navigationItem.leftBarButtonItem = self.editButtonItem;
     
-    self.buttonIndexMapping = [[NSMutableArray alloc] initWithCapacity:20];
+    self.sectionViewIndexMapping = [[NSMutableArray alloc] initWithCapacity:20];
     self.dummyView = [[UIButton alloc] init];
     self.sectionsDeletionsPending = NO;
     
@@ -146,6 +148,7 @@
     label.backgroundColor = [UIColor clearColor];
     label.font = [UIFont boldSystemFontOfSize:14];
     label.textColor = [UIColor whiteColor];
+    label.tag = kLabelTag;
     [customView addSubview:label];
     
     // Create the delete button object
@@ -170,12 +173,12 @@
 
     // Store this button in the mapping array - first make sure that we have an object to replace
     
-    while ([self.buttonIndexMapping count] <= section)
-        [self.buttonIndexMapping addObject:_dummyView];
+    while ([self.sectionViewIndexMapping count] <= section)
+        [self.sectionViewIndexMapping addObject:_dummyView];
     
     // Now replace the object at that index
     
-    [self.buttonIndexMapping replaceObjectAtIndex:section withObject:customView];
+    [self.sectionViewIndexMapping replaceObjectAtIndex:section withObject:customView];
     
     return customView;
 }
@@ -292,7 +295,7 @@
 
 #pragma mark - Fetched results controller
 
-- (void)updateButtonMapping
+- (void)updateSectionViewMapping
 {
     if (self.sectionsDeletionsPending)
     {
@@ -300,7 +303,7 @@
         
         // Add non null object to our new array
         
-        for (id obj in self.buttonIndexMapping) {
+        for (id obj in self.sectionViewIndexMapping) {
             if (![obj isKindOfClass:[NSNull class]]) {
                 [newMapping addObject:obj];
             }
@@ -308,7 +311,7 @@
         
         // Use the new array from now on
         
-        self.buttonIndexMapping = newMapping;
+        self.sectionViewIndexMapping = newMapping;
     }
     
     self.sectionsDeletionsPending = NO;
@@ -411,7 +414,7 @@
             // We can't just deleted it from the mapping because any future calls to NSFetchedResultsChangeDelete are based on the indexes at the 
             // start of this set of deleted. We mark the deletion and rember that we have to remap later
             
-            [self.buttonIndexMapping replaceObjectAtIndex:sectionIndex withObject:[NSNull null]];
+            [self.sectionViewIndexMapping replaceObjectAtIndex:sectionIndex withObject:[NSNull null]];
             self.sectionsDeletionsPending = YES;
             
             break;
@@ -423,7 +426,7 @@
             // If we have already deleted sections then we need to remove them from the mapping. If we don't do this then the 
             // indexes in the mapping array will not match those passed in here.
             
-            [self updateButtonMapping];
+            [self updateSectionViewMapping];
 
             // Insert the row
             
@@ -432,16 +435,39 @@
             // Stick a dummy object in our mapping array - it'll be updated when UITableView calls back to get the header view.
             // We don't pass in a NSNull since that's what we do to mark deleted rows...
             
-            [self.buttonIndexMapping insertObject:_dummyView atIndex:sectionIndex];
+            [self.sectionViewIndexMapping insertObject:_dummyView atIndex:sectionIndex];
             
             break;
 
         case NSFetchedResultsChangeUpdate:
-            
+        {
             NSLog(@"TAFetchResultsController requesting SECTION UPDATE at index %d]", sectionIndex);
-            [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
+
+            // *Any* changes to the section object will cause this call back to be received.
+            //
+            // This includes, for example, deleting a row from the section since core data sees that as a change to the relationship.
+            //
+            // To avoid flickering the section title needlessly we need to check if that has changed. There's no SDK to get a section's title,
+            // however our sectionViewMapping once again comes to the rescue. Ugly? Yes. but it works.            
+            
+            UIView *container = (UIView *)[self.sectionViewIndexMapping objectAtIndex:sectionIndex];
+            
+            if (container) // there really should be!
+            {
+                UILabel *label = (UILabel *)[container viewWithTag:kLabelTag];
+                
+                id <TAFetchedResultsSectionInfo> si = [[self.taFetchedResultsController allSections] objectAtIndex:sectionIndex];
+                Section *section = (Section *)[si theManagedObject];
+                
+                if (![label.text isEqualToString:section.name])
+                {
+                    NSLog(@"Section name changed from %@ to %@ - reloading section", label.text, section.name);
+                    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
+                }
+            }
             
             break;
+        }
     }
 }
 
@@ -494,7 +520,7 @@
     // In there were any sections deleted during the update then this would have been noted in the button mapping. Now that's done we should
     // actually remove the nullified objects.
 
-    [self updateButtonMapping];
+    [self updateSectionViewMapping];
     
 }
 
@@ -574,7 +600,7 @@
     
     // We get the index of of our button by searching our array
     
-    NSUInteger index = [self.buttonIndexMapping indexOfObject:button.superview];
+    NSUInteger index = [self.sectionViewIndexMapping indexOfObject:button.superview];
     if (index == NSNotFound)
     {
         NSLog(@"Unable to find index of section from button object. Oops");
@@ -601,7 +627,7 @@
     
     // We get the index of of our button by searching our array
     
-    NSUInteger index = [self.buttonIndexMapping indexOfObject:button.superview];
+    NSUInteger index = [self.sectionViewIndexMapping indexOfObject:button.superview];
     if (index == NSNotFound)
     {
         NSLog(@"Unable to find index of section from button object. Oops");
