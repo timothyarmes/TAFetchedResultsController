@@ -11,7 +11,7 @@
         <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Item" inverseName="section" inverseEntity="Item" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Section" positionX="160" positionY="192" width="128" height="105"/>
         <element name="Item" positionX="160" positionY="192" width="128" height="75"/>
+        <element name="Section" positionX="160" positionY="192" width="128" height="105"/>
     </elements>
 </model>

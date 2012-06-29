@@ -134,7 +134,13 @@ Having the object is a very useful thing to have! Now you can easily access all 
 
 TAFetchedResultsController listens to context changes that will affect your sections (such as the insertion and deletion of sections) and calls your delegate to inform your to update your table.
 
-Notice that unlike NSFetchedResultsController you will also be informed if a section is updated. This may be useful if the section's titel can be changed at any time.
+Notice that unlike NSFetchedResultsController you will also be informed if a section is updated. This may be useful if the section's title can be changed at any time.
+
+While this is very useful feature, you should be aware that Core Data may report a section change when one of its items it modified in any way. It would therefore be unwise to simply reload the section titleand change request that you received, or else there will be unnecessary flickering of the section header whenever one of it's rows changes.
+
+The demonstration project show you one way to handle this issue by testing to see if the section's title has changed before you updatethe header. Unfortunately this requires some legwork since UITableView doesn't provide access to the headers so thye need to be tracked manually.
+
+Another option is to remove the reverse relationship between the item Entity and the Section Entity in the core data model. In this way Core Data won't report any modifications to the items as changes to the section. Be aware though that Apple recommend always having the reverse relationship unless there's a very good reason not do do so.
 
 How it works
 ============
