@@ -151,7 +151,7 @@
     label.tag = kLabelTag;
     [customView addSubview:label];
     
-    // Create the delete button object
+    // Create the 'delete' button object
     
     UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(tableView.bounds.size.width - 60, 6, 50, 30.0)];
     button.backgroundColor = [UIColor redColor];
@@ -161,9 +161,19 @@
     [button addTarget:self action:@selector(deleteSection:) forControlEvents:UIControlEventTouchUpInside];
     [customView addSubview:button];
     
-    // Create the update button object
+    // Create the 'empty' button object
     
     button = [[UIButton alloc] initWithFrame:CGRectMake(tableView.bounds.size.width - 60 - 60, 6, 50, 30.0)];
+    button.backgroundColor = [UIColor redColor];
+    button.opaque = YES;
+    button.titleLabel.font = [UIFont boldSystemFontOfSize:12];
+    [button setTitle:@"Empty" forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(emptySection:) forControlEvents:UIControlEventTouchUpInside];
+    [customView addSubview:button];
+
+    // Create the 'update' button object
+    
+    button = [[UIButton alloc] initWithFrame:CGRectMake(tableView.bounds.size.width - 60 - 60 - 60, 6, 50, 30.0)];
     button.backgroundColor = [UIColor blueColor];
     button.opaque = YES;
     button.titleLabel.font = [UIFont boldSystemFontOfSize:12];
@@ -610,6 +620,40 @@
     id <TAFetchedResultsSectionInfo> si = [[self.taFetchedResultsController allSections] objectAtIndex:index];
     [self.managedObjectContext  deleteObject:si.theManagedObject];
     
+    // Save the context
+    
+    NSError *error = nil;
+    if (![self.managedObjectContext save:&error]) {
+        // Replace this implementation with code to handle the error appropriately.
+        // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. 
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        abort();
+    }
+}
+
+- (void)emptySection:(UIButton *)button {
+    
+    // Empty a section from the object model by deleting all the rows that it owns.
+    // This allows us to test the deletion of multiple rows at once.
+    //
+    // TAFetchedResultsController will detect the change and call back to update the table....
+    
+    // We get the index of of our button by searching our array
+    
+    NSUInteger index = [self.sectionViewIndexMapping indexOfObject:button.superview];
+    if (index == NSNotFound)
+    {
+        NSLog(@"Unable to find index of section from button object. Oops");
+        abort();
+    }
+    
+    id <TAFetchedResultsSectionInfo> si = [[self.taFetchedResultsController allSections] objectAtIndex:index];
+    Section *section = (Section *)si.theManagedObject;
+    
+    for (Item *item in section.items) {
+        [self.managedObjectContext deleteObject:item];
+    }
+        
     // Save the context
     
     NSError *error = nil;

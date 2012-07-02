@@ -3,6 +3,8 @@ TAFetchedResultsController
 
 TAFetchedResultsController is a subclass of NSFetchedResultsController that allows for empty sections.
 
+TAFetchedResultsController requires ARC and has been developed under iOS 5 - it has not been tested on iOS 4.
+
 ## NSFetchedResultsController limitations
 
 NSFetchedResultsController is a fantastic class, it allows you to map a core data entity to a UITableView, and keeps them in sync with each other through the use of delegate calls.
@@ -138,7 +140,7 @@ Notice that unlike NSFetchedResultsController you will also be informed if a sec
 
 While this is very useful feature, you should be aware that Core Data may report a section change when one of its items it modified in any way. It would therefore be unwise to simply reload the section titleand change request that you received, or else there will be unnecessary flickering of the section header whenever one of it's rows changes.
 
-The demonstration project show you one way to handle this issue by testing to see if the section's title has changed before you updatethe header. Unfortunately this requires some legwork since UITableView doesn't provide access to the headers so thye need to be tracked manually.
+The demonstration project show you one way to handle this issue by testing to see if the section's title has changed before you update the header. Unfortunately this requires some legwork since UITableView doesn't provide access to the headers so they need to be tracked manually.
 
 Another option is to remove the reverse relationship between the item Entity and the Section Entity in the core data model. In this way Core Data won't report any modifications to the items as changes to the section. Be aware though that Apple recommend always having the reverse relationship unless there's a very good reason not do do so.
 
