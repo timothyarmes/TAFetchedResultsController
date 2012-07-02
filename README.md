@@ -138,11 +138,38 @@ TAFetchedResultsController listens to context changes that will affect your sect
 
 Notice that unlike NSFetchedResultsController you will also be informed if a section is updated. This may be useful if the section's title can be changed at any time.
 
-While this is very useful feature, you should be aware that Core Data may report a section change when one of its items it modified in any way. It would therefore be unwise to simply reload the section titleand change request that you received, or else there will be unnecessary flickering of the section header whenever one of it's rows changes.
+While this is very useful feature, you should be aware that Core Data may report a section change when one of its items is modified in **any** way. It would therefore be unwise to simply reload the section title for any change request that you received, or else there will be unnecessary flickering of the section header whenever one of it's rows changes.
 
-The demonstration project show you one way to handle this issue by testing to see if the section's title has changed before you update the header. Unfortunately this requires some legwork since UITableView doesn't provide access to the headers so they need to be tracked manually.
+The demonstration project shows you one way to handle this issue by testing to see if the section's title has changed before you update the header. Unfortunately this requires some legwork since UITableView doesn't provide access to the headers so they need to be tracked manually.
 
 Another option is to remove the reverse relationship between the item Entity and the Section Entity in the core data model. In this way Core Data won't report any modifications to the items as changes to the section. Be aware though that Apple recommend always having the reverse relationship unless there's a very good reason not do do so.
+
+## Delegate methods
+
+The deleage methods are virtually the same as for NSFetchedResultsController; you see see that for the details.
+
+#### controllerWillChangeContent:
+
+Notifies the receiver that the fetched results controller is about to start processing of one or more changes due to an add, remove, move, or update.
+
+You should use that deletate to issus a beginUpdates to  your table view.
+
+#### controller:didChangeObject:atIndexPath:forChangeType:newIndexPath:
+
+Notifies the receiver that a fetched object has been changed due to an add, remove, move, or update. You should update the associated table row.
+
+#### controller:didChangeSection:atIndex:forChangeType:
+
+Notifies the receiver of the addition or removal of a section.
+
+Unlike NSFetchedResultsController, you will also been informated of any updates to the section, and you should update your section header **if** it's been changed. See *Responding to section changes* above for more details.
+
+#### controllerDidChangeContent:
+
+Notifies the receiver that the fetched results controller has completed processing of one or more changes due to an add, remove, move, or update.
+
+You should use this to end the table updates.
+
 
 How it works
 ============
