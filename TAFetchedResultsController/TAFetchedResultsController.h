@@ -3,7 +3,7 @@
 //  ShoppingList
 //
 //  Created by Timothy Armes on 13/06/2012.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2012 Timothy Armes. All rights reserved.
 //
 //  This subclass extends NSFetchedResultsController to allow for empty sections to be handled.
 //  It requires a one-to-many (section-to-items) core data model.
