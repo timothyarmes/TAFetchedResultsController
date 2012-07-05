@@ -693,4 +693,35 @@
     }
 }
 
+// This action simulates the scenario where the model has been updated elsewhere, and
+// all row entities have been removed. This means that the NSFetchedResultsController (NSFRC)
+// now has zero sections, but we still need to remove our rows from the tableview...
+
+- (IBAction)clearAllItems:(id)sender {
+    
+    // Create fetch request
+	NSFetchRequest *request = [[NSFetchRequest alloc] init];
+	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Item" inManagedObjectContext:self.managedObjectContext];
+	[request setEntity:entity];	
+    
+	// Execute the request
+	NSError *error = nil;
+	NSArray *fetchResults = [self.managedObjectContext executeFetchRequest:request error:&error];
+    
+	// Delete the objects returned if the results weren't nil
+	if (fetchResults != nil) {
+		for (NSManagedObject *manObj in fetchResults) {
+			[self.managedObjectContext deleteObject:manObj];
+		}
+    }
+    
+    if (![self.managedObjectContext save:&error]) {
+        // Replace this implementation with code to handle the error appropriately.
+        // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. 
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        abort();
+    }    
+}
+
+
 @end

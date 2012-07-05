@@ -328,17 +328,25 @@
     // If we delay the remapping then we won't have a mapping for the the newly created section.
     //
     // We need to hold onto the old mapping (with the deleted section), remap, then use the appropriate table!
+
+    // Note that in the case that several sections are deleted at once, we should only recreate the mapping once,
+    // otherwise we'll be copying the mapping that would have already been updateded by the previous call
+    // to this callback.
     
-    NSLog(@"Section changes detected. Storing copy of old mapping and creating a new map");
-    
-    NSMutableArray *prevMapping = [NSMutableArray arrayWithCapacity:[_allSections count]];
-    for (TASectionInfo *si in _allSections) {
-        TASectionInfo *newInfo = [[TASectionInfo alloc] initWithManagedObject:nil];
-        newInfo.sectionIndexInFetchedResults = si.sectionIndexInFetchedResults;
-        [prevMapping addObject:newInfo];
+    if (_previousMapping == nil)
+    {
+        NSLog(@"Section changes detected. Storing copy of old mapping and creating a new map");
+        
+        NSMutableArray *prevMapping = [NSMutableArray arrayWithCapacity:[_allSections count]];
+        for (TASectionInfo *si in _allSections) {
+            TASectionInfo *newInfo = [[TASectionInfo alloc] initWithManagedObject:nil];
+            newInfo.sectionIndexInFetchedResults = si.sectionIndexInFetchedResults;
+            [prevMapping addObject:newInfo];
+        }
+        
+        self.previousMapping = prevMapping;
     }
     
-    self.previousMapping = prevMapping;
     [self updateSectionMap];
 }
 
