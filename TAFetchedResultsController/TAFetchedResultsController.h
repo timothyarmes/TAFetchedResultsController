@@ -24,6 +24,7 @@
 
 @property (strong, nonatomic) NSArray *allSections;
 @property (weak, nonatomic) id <NSFetchedResultsControllerDelegate> delegate;
+@property BOOL disabled;
 
 /* Initializes an instance of TAFetchedResultsController
  
@@ -43,5 +44,9 @@
                      cacheName:(NSString *)name;
 
 - (void)updateSections;
+
+// Use this instead of indexPathForObject:
+
+- (NSIndexPath *)taIndexPathForObject:(id)object;
 
 @end

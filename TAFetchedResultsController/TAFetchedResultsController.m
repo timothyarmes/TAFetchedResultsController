@@ -113,6 +113,8 @@
 @synthesize allSections = _allSections;
 @synthesize delegateInterceptor = _delegateInterceptor;
 @synthesize previousMapping = _previousMapping;
+@synthesize disabled = _disabled;
+
 @dynamic delegate;
 
 - (id)initWithItemFetchRequest:(NSFetchRequest *)itemFetchRequest
@@ -235,6 +237,21 @@
     }
 }
 
+- (BOOL)disabled
+{
+    return _disabled;
+}
+
+- (void)setDisabled:(BOOL)disabled  
+{
+    _disabled = disabled;
+    
+    if (!disabled)
+    {
+        [self updateSections];
+    }
+}
+
 - (NSArray *)fetchedSections
 {
     return [super sections];
@@ -306,6 +323,12 @@
     return [super objectAtIndexPath:indexPath];
 }
 
+- (NSIndexPath *)taIndexPathForObject:(id)object
+{
+    NSIndexPath *indexPath = [super indexPathForObject:object];
+    return [self convertNSFetchedResultsSectionIndexToUITableViewControllerSectionIndex:indexPath];
+}
+
 #pragma mark - Delegate Interception
 
 - (void)setDelegate:(id)newDelegate
@@ -320,6 +343,9 @@
 - (void)controller:(NSFetchedResultsController *)controller didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo
            atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type
 {
+    if (_disabled)
+        return;
+    
     // This will be called if a row has been moved to a new section or if the last row has been deleted from a section
     //
     // This will cause the indexPath passed to didChangeObject to become out of sync. If we update the mapping now then
@@ -356,6 +382,9 @@
      forChangeType:(NSFetchedResultsChangeType)type
       newIndexPath:(NSIndexPath *)newIndexPath
 {
+    if (_disabled)
+        return;
+
     if ([(NSObject *)_delegateInterceptor.receiver respondsToSelector:@selector(controller:didChangeObject:atIndexPath:forChangeType:newIndexPath:)]) {
         
         NSLog(@"TAFetchedResultsController has intercepted a delegate call to didChangeObject with indexPath [%d, %d] and newIndexPath [%d, %d].", indexPath.section, indexPath.row, newIndexPath.section, newIndexPath.row);
@@ -396,6 +425,9 @@
 
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
 {
+    if (_disabled)
+        return;
+
     NSLog(@"controllerDidChangeContent called - clearing previous mapping");
     self.previousMapping = nil;
     
@@ -410,6 +442,9 @@
 
 - (void)handleDataModelChange:(NSNotification *)notification;
 {
+    if (_disabled)
+        return;
+
     NSSet *updatedObjects  = [[notification userInfo] objectForKey:NSUpdatedObjectsKey];
     NSSet *deletedObjects  = [[notification userInfo] objectForKey:NSDeletedObjectsKey];
     NSSet *insertedObjects = [[notification userInfo] objectForKey:NSInsertedObjectsKey];
