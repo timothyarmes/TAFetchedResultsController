@@ -10,7 +10,9 @@
 #import "TAFetchedResultsController.h"
 #import "Section.h"
 
-@interface DemoViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, NSFetchedResultsControllerDelegate> 
+@interface DemoViewController : UIViewController <UITableViewDelegate,
+                                                  UITableViewDataSource,
+                                                  TAFetchedResultsControllerDelegate> 
 
 @property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;

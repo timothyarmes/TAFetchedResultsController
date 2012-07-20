@@ -102,17 +102,17 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    // This is handled as for NSFetchedResultsController, but we must be careful to access 'allSections' and not 'sections'.
+    // This is handled as for NSFetchedResultsController, but we must be careful to access 'sections' and not 'sections'.
     
-    NSUInteger numSections = [[self.taFetchedResultsController allSections] count];    
+    NSUInteger numSections = [[self.taFetchedResultsController sections] count];    
     return numSections;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    // This is handled as for NSFetchedResultsController, but we must be careful to access 'allSections' and not 'sections'.
+    // This is handled as for NSFetchedResultsController, but we must be careful to access 'sections' and not 'sections'.
     
-    id <TAFetchedResultsSectionInfo> sectionInfo = [[self.taFetchedResultsController allSections] objectAtIndex:section];
+    id <TAFetchedResultsSectionInfo> sectionInfo = [[self.taFetchedResultsController sections] objectAtIndex:section];
     return [sectionInfo numberOfObjects];
 }
 
@@ -245,7 +245,7 @@
     
     Item *itemToMove = [self itemAtIndexPath:sourceIndexPath];
     
-    id <TAFetchedResultsSectionInfo> sectionInfo = [[self.taFetchedResultsController allSections] objectAtIndex:proposedDestinationIndexPath.section];
+    id <TAFetchedResultsSectionInfo> sectionInfo = [[self.taFetchedResultsController sections] objectAtIndex:proposedDestinationIndexPath.section];
     NSArray *items = [sectionInfo objects];
     NSUInteger idx = 0;
     for (Item *itemInSection in items) {
@@ -264,7 +264,7 @@
     self.inManualReorder = YES;
     
     Item *item = [self itemAtIndexPath:fromIndexPath];
-    id <TAFetchedResultsSectionInfo> sectionInfo = [[self.taFetchedResultsController allSections] objectAtIndex:toIndexPath.section];
+    id <TAFetchedResultsSectionInfo> sectionInfo = [[self.taFetchedResultsController sections] objectAtIndex:toIndexPath.section];
     Section *newSection = (Section *)sectionInfo.theManagedObject;
     
     // Assign the item to the new section
@@ -292,7 +292,7 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    id <TAFetchedResultsSectionInfo> sectionInfo = [[self.taFetchedResultsController allSections] objectAtIndex:section];
+    id <TAFetchedResultsSectionInfo> sectionInfo = [[self.taFetchedResultsController sections] objectAtIndex:section];
     Section *sectionObject = (Section *)sectionInfo.theManagedObject;
     return sectionObject.name;
 }
@@ -309,7 +309,7 @@
 {
     if (self.sectionsDeletionsPending)
     {
-        NSMutableArray *newMapping = [NSMutableArray arrayWithCapacity:[[self.taFetchedResultsController allSections] count]];
+        NSMutableArray *newMapping = [NSMutableArray arrayWithCapacity:[[self.taFetchedResultsController sections] count]];
         
         // Add non null object to our new array
         
@@ -466,7 +466,7 @@
             {
                 UILabel *label = (UILabel *)[container viewWithTag:kLabelTag];
                 
-                id <TAFetchedResultsSectionInfo> si = [[self.taFetchedResultsController allSections] objectAtIndex:sectionIndex];
+                id <TAFetchedResultsSectionInfo> si = [[self.taFetchedResultsController sections] objectAtIndex:sectionIndex];
                 Section *section = (Section *)[si theManagedObject];
                 
                 if (![label.text isEqualToString:section.name])
@@ -541,7 +541,7 @@
     
     Section *newSection = [NSEntityDescription insertNewObjectForEntityForName:@"Section" inManagedObjectContext:self.managedObjectContext];
     
-    newSection.name = [NSString stringWithFormat:@"Section %d", [[self.taFetchedResultsController allSections] count] + 1];
+    newSection.name = [NSString stringWithFormat:@"Section %d", [[self.taFetchedResultsController sections] count] + 1];
     newSection.timeStamp = [NSDate date];
     
     // Create a unique and unchanging UUID for this sections
@@ -568,14 +568,14 @@
     
     // Make sure there's at least one section.
     
-    if ([self.taFetchedResultsController.allSections count] == 0)
+    if ([self.taFetchedResultsController.sections count] == 0)
         [self addNewSection:nil];
     
     // If we havn't added a section in this session, just add the item to the first one for the purposes of this demo
     
     if (!self.mostRecentlyCreatedSection)
     {
-        id <TAFetchedResultsSectionInfo> si = (id <TAFetchedResultsSectionInfo>)[self.taFetchedResultsController.allSections objectAtIndex:0];
+        id <TAFetchedResultsSectionInfo> si = (id <TAFetchedResultsSectionInfo>)[self.taFetchedResultsController.sections objectAtIndex:0];
         self.mostRecentlyCreatedSection = (Section *)si.theManagedObject;
     }
     
@@ -617,7 +617,7 @@
         abort();
     }
     
-    id <TAFetchedResultsSectionInfo> si = [[self.taFetchedResultsController allSections] objectAtIndex:index];
+    id <TAFetchedResultsSectionInfo> si = [[self.taFetchedResultsController sections] objectAtIndex:index];
     [self.managedObjectContext  deleteObject:si.theManagedObject];
     
     // Save the context
@@ -647,7 +647,7 @@
         abort();
     }
     
-    id <TAFetchedResultsSectionInfo> si = [[self.taFetchedResultsController allSections] objectAtIndex:index];
+    id <TAFetchedResultsSectionInfo> si = [[self.taFetchedResultsController sections] objectAtIndex:index];
     Section *section = (Section *)si.theManagedObject;
     
     for (Item *item in section.items) {
@@ -678,7 +678,7 @@
         abort();
     }
     
-    id <TAFetchedResultsSectionInfo> si = [[self.taFetchedResultsController allSections] objectAtIndex:index];
+    id <TAFetchedResultsSectionInfo> si = [[self.taFetchedResultsController sections] objectAtIndex:index];
     Section *section = (Section *)si.theManagedObject;
     section.name = @"Updated!";
     

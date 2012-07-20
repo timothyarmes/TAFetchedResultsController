@@ -19,7 +19,6 @@
 		2273D2681592065E00778B21 /* DemoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2273D2661592065E00778B21 /* DemoViewController.xib */; };
 		2273D270159209E900778B21 /* Item.m in Sources */ = {isa = PBXBuildFile; fileRef = 2273D26F159209E900778B21 /* Item.m */; };
 		2273D27615920F0A00778B21 /* TAFetchedResultsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2273D27515920F0A00778B21 /* TAFetchedResultsController.m */; };
-		2273D27A15920FA800778B21 /* TADelegateInterceptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 2273D27915920FA800778B21 /* TADelegateInterceptor.m */; };
 		2273D28E1593585000778B21 /* Section.m in Sources */ = {isa = PBXBuildFile; fileRef = 2273D28D1593585000778B21 /* Section.m */; };
 /* End PBXBuildFile section */
 
@@ -43,8 +42,6 @@
 		2273D26F159209E900778B21 /* Item.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Item.m; sourceTree = "<group>"; };
 		2273D27415920F0A00778B21 /* TAFetchedResultsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TAFetchedResultsController.h; path = ../../TAFetchedResultsController/TAFetchedResultsController.h; sourceTree = "<group>"; };
 		2273D27515920F0A00778B21 /* TAFetchedResultsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TAFetchedResultsController.m; path = ../../TAFetchedResultsController/TAFetchedResultsController.m; sourceTree = "<group>"; };
-		2273D27815920FA800778B21 /* TADelegateInterceptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TADelegateInterceptor.h; path = ../../TAFetchedResultsController/TADelegateInterceptor.h; sourceTree = "<group>"; };
-		2273D27915920FA800778B21 /* TADelegateInterceptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TADelegateInterceptor.m; path = ../../TAFetchedResultsController/TADelegateInterceptor.m; sourceTree = "<group>"; };
 		2273D28C1593585000778B21 /* Section.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Section.h; sourceTree = "<group>"; };
 		2273D28D1593585000778B21 /* Section.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Section.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -121,8 +118,6 @@
 		2273D27715920F1600778B21 /* TAFetchedResultsController */ = {
 			isa = PBXGroup;
 			children = (
-				2273D27815920FA800778B21 /* TADelegateInterceptor.h */,
-				2273D27915920FA800778B21 /* TADelegateInterceptor.m */,
 				2273D27415920F0A00778B21 /* TAFetchedResultsController.h */,
 				2273D27515920F0A00778B21 /* TAFetchedResultsController.m */,
 			);
@@ -210,7 +205,6 @@
 				2273D2621592065E00778B21 /* DemoViewController.m in Sources */,
 				2273D270159209E900778B21 /* Item.m in Sources */,
 				2273D27615920F0A00778B21 /* TAFetchedResultsController.m in Sources */,
-				2273D27A15920FA800778B21 /* TADelegateInterceptor.m in Sources */,
 				2273D28E1593585000778B21 /* Section.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -323,6 +317,7 @@
 				2273D26D1592065E00778B21 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

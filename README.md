@@ -1,11 +1,11 @@
 TAFetchedResultsController
 ==========================
 
-TAFetchedResultsController is a subclass of NSFetchedResultsController that allows for empty sections.
+TAFetchedResultsController is a "subclass" of NSFetchedResultsController that allows for empty sections.
 
 TAFetchedResultsController requires ARC and has been developed under iOS 5 - it has not been tested on iOS 4.
 
-## NSFetchedResultsController limitations
+## NSFetchedResultsController's limitations
 
 NSFetchedResultsController is a fantastic class, it allows you to map a core data entity to a UITableView, and keeps them in sync with each other through the use of delegate calls.
 
@@ -17,7 +17,9 @@ However, NSFetchedResultsController's support for sections is limited. While it 
 
 ## TAFetchedResultsController
 
-TAFetchedResultsController is a subclass of NSFetchedResultsController that solves the above problems. It's *almost* a drop in replacement, but there are a few differences.
+TAFetchedResultsController is a "subclass" of NSFetchedResultsController that solves the above problems. It's *almost* a drop in replacement, but there are a few differences.
+
+Subclass is in quotes because it doesn't truely subclass NSFetchedResultsController, but rather includes an instance of NSFetchedResultsController internally. This has beed done for technical reasons, but for all intents and purposes its interface is so clse to NSFetchedResultsController that dropping it into a project should be trivial.
 
 If you don't know how to use NSFetchedResultsController then you should first read about that first in Apple's documentation. This document will assume that you understand how to use it.
 
@@ -130,7 +132,7 @@ TAFetchedResultsSectionInfo is a subclass of NSFetchedResultsSectionInfo. An arr
 
     @property (nonatomic, readonly) NSManagedObject *theManagedObject;
 
-Having the object is a very useful thing to have! Now you can easily access all the fields in order to return a sensible section name (unlike for NSFeetchedResultsController!)
+Having the object is a very useful thing to have! Now you can easily access all the fields in order to return a sensible section name (unlike for NSFetchedResultsController!)
 
 ## Responding to section changes
 
@@ -198,20 +200,12 @@ TAFetchedResultsController solves this problem by maintaining a mapping between 
 Known Limitations
 =================
 
-## Section moves are not net tracked
+## Section moves are not yet tracked
 
-TAFetchedResultsController will reponds to changes in your Section objects and call you back to insert, delete or update sections aas required.
+TAFetchedResultsController will reponds to changes in your Section objects and call you back to insert, delete or update sections as required.
 
 However, changes to section order are not yet handled, and the behaviour is currently undefined should you do this.
 
-Gotchas
-=======
+## Indexes are not yet handled
 
-## Using [self.taFetchedResultsController sections] will get you in trouble
-
-When converting existing code to use TAFetchedResultsController you must remember to use the *allSections* accessor on the controller, and not the *sections* accessor.
-
-It would have been lovely to override this property to return all the sections, thereby making this class even closer to a drop in replacement. However, it seems that the NSFetchedResultsController implementation internally calls self.sections. When it does this it's important that it recovers it's own internal list of sections and not our replacement list (NSFetchedResultsController must no nothing about what we're doing for this to work).
-
-If there's a solution to this problem, or a way to ensure that the user doesn't call *sections* by accident, I'd love to know about it….
-
+NSFetchedResultController's support for indexes (down the edge of the table view) hasn't yet been added to TAFetchedResultsController. This may happen when the author has such a need for it himself :)

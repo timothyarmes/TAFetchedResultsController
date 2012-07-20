@@ -18,12 +18,46 @@
 
 @end
 
-// Subclass NSFetchedResultsController
+// TAFetchedResultsControllerDelegate protocol
+//
+// This is virtually identical to the NSFetchedResultsController protocol except that the controller involved
+// is a TAFetchedResultsControllerDelegate.
+//
+// Note that controller:sectionIndexTitleForSectionName: isn't implemented at this point.
 
-@interface TAFetchedResultsController : NSFetchedResultsController <NSFetchedResultsControllerDelegate>
+@class TAFetchedResultsController;
 
-@property (strong, nonatomic) NSArray *allSections;
-@property (weak, nonatomic) id <NSFetchedResultsControllerDelegate> delegate;
+@protocol TAFetchedResultsControllerDelegate <NSObject>
+
+- (void)controller:(TAFetchedResultsController *)controller
+   didChangeObject:(id)anObject
+       atIndexPath:(NSIndexPath *)indexPath
+     forChangeType:(NSFetchedResultsChangeType)type
+      newIndexPath:(NSIndexPath *)newIndexPath;
+
+- (void)controller:(TAFetchedResultsController *)controller
+  didChangeSection:(id <TAFetchedResultsSectionInfo>)sectionInfo
+           atIndex:(NSUInteger)sectionIndex
+     forChangeType:(NSFetchedResultsChangeType)type;
+
+- (void)controllerDidChangeContent:(TAFetchedResultsController *)controller;
+- (void)controllerWillChangeContent:(TAFetchedResultsController *)controller;
+
+
+@end
+
+// "Subclass" of NSFetchedResultsController
+
+@interface TAFetchedResultsController : NSObject <NSFetchedResultsControllerDelegate>
+
+@property (nonatomic, readonly) NSFetchRequest *itemFetchRequest;
+@property (nonatomic, readonly) NSFetchRequest *sectionFetchRequest;
+@property (nonatomic, readonly) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, readonly) NSString *cacheName;
+@property  (nonatomic, readonly) NSArray *fetchedObjects;
+@property (nonatomic, readonly) NSArray *sections;
+
+@property (weak, nonatomic) id <TAFetchedResultsControllerDelegate> delegate;
 @property BOOL disabled;
 
 /* Initializes an instance of TAFetchedResultsController
@@ -43,10 +77,17 @@
         sectionGroupingKeyPath:(NSString *)sectionGroupingKeyPath
                      cacheName:(NSString *)name;
 
+
+/* Force the controlled to update the sections. This isn't expected to be useful since it handles this automatically */
+
 - (void)updateSections;
 
-// Use this instead of indexPathForObject:
+/* NSFetchedResultsController functions */
 
-- (NSIndexPath *)taIndexPathForObject:(id)object;
+- (id)objectAtIndexPath:(NSIndexPath *)indexPath;
+- (NSIndexPath *)indexPathForObject:(id)object;
+- (BOOL)performFetch:(NSError **)error;
+
++ (void)deleteCacheWithName:(NSString *)name;
 
 @end
