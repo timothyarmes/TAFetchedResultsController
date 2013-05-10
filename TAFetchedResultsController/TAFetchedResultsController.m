@@ -189,6 +189,26 @@
     return [_nsFetchedResultsController performFetch:error];
 }
 
+- (NSArray *)sectionIndexTitles
+{
+    NSMutableArray *sectionIndexTitles;
+    for (NSString *sectionTitle in [_sections valueForKey:_sectionIndexTitleKeyPath]) {
+        if ([sectionTitle length] > 0) {
+            NSString *firstLetter = [sectionTitle substringWithRange:[sectionTitle rangeOfComposedCharacterSequenceAtIndex:0]];
+            if (![sectionIndexTitles containsObject:firstLetter]) {
+                [sectionIndexTitles addObject:firstLetter];
+            }
+        }
+    }
+    return sectionIndexTitles;
+}
+
+- (NSInteger)sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)sectionIndex
+{
+    // we want to scroll even to empty sections
+    return sectionIndex;
+}
+
 #pragma mark - Section mapping
 
 - (void)updateSections
