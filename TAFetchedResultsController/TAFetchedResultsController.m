@@ -216,6 +216,7 @@
     NSLog(@"Updating section list");
     
     NSError *error = nil;
+    [self.nsFetchedResultsController performFetch:&error];
     NSArray *sections = [_managedObjectContext executeFetchRequest:_sectionFetchRequest error:&error];
     if (sections == nil)
     {
@@ -267,11 +268,17 @@
             // use this to locate the actual section entity. The order of the section array can be totally different to that
             // returned by NSFetchedResultsController :)
             
+            NSLog(@"nameFromFetchResults: %@", nameFromFetchResults);
+            
             BOOL found = NO;
             for (int idx = 0; idx < _sections.count; idx++)
             {
                 TASectionInfo *si = [_sections objectAtIndex:idx];
                 NSString *propertyNameForSectionGrouping = [si.theManagedObject valueForKey:_propertyNameForSectionGrouping];
+                if ([propertyNameForSectionGrouping isKindOfClass:[NSNumber class]]) {
+                    propertyNameForSectionGrouping = [((NSNumber *)propertyNameForSectionGrouping) stringValue];
+                }
+                
                 if ([propertyNameForSectionGrouping isEqualToString:nameFromFetchResults])
                 {
                     si.sectionIndexInFetchedResults = sectionIdx;
@@ -425,8 +432,8 @@
         
         self.previousMapping = prevMapping;
     }
-    
-    [self updateSectionMap];
+
+    [self updateSections];
 }
 
 - (void)controller:(NSFetchedResultsController *)controller
@@ -543,7 +550,6 @@
         // Re-fetch the sections list (without the deleted sections) and update us internally
         //
         // Once we've done this the indexes of the sections will be correct for the sections to be inserted and modified
-        
         [self updateSections];
         
         idx = 0;
