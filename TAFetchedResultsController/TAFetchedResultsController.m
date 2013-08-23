@@ -248,7 +248,7 @@
             // returned by NSFetchedResultsController :)
             
             BOOL found = NO;
-            for (int idx = 0; idx < _sections.count; idx++)
+            for (NSUInteger idx = 0; idx < _sections.count; idx++)
             {
                 TASectionInfo *si = [_sections objectAtIndex:idx];
                 NSString *propertyNameForSectionGrouping = [si.theManagedObject valueForKey:_propertyNameForSectionGrouping];
@@ -304,12 +304,12 @@
 
 - (NSIndexPath *)convertUITableViewControllerIndexPathToNSFetchedResultsControllerIndexPath:(NSIndexPath *)indexPath usingMapping:(NSArray *)mapping
 {    
-    TASectionInfo *si = (TASectionInfo *)[mapping objectAtIndex:indexPath.section];    
+    TASectionInfo *si = (TASectionInfo *)[mapping objectAtIndex:(NSUInteger)indexPath.section];
     NSUInteger sectionIndex = si.sectionIndexInFetchedResults;
     if (sectionIndex == NSNotFound) // Empty section
         return nil;
     
-    return [NSIndexPath indexPathForRow:indexPath.row inSection:sectionIndex];
+    return [NSIndexPath indexPathForRow:indexPath.row inSection:(NSInteger)sectionIndex];
 }
 
 - (NSIndexPath *)convertUITableViewControllerIndexPathToNSFetchedResultsControllerIndexPath:(NSIndexPath *)indexPath
@@ -324,7 +324,7 @@
     int idx = 0;
     for (TASectionInfo *si in mapping) {
         NSUInteger sectionIndexInFetchedResults = si.sectionIndexInFetchedResults;
-        if (sectionIndexInFetchedResults == indexPath.section) 
+        if (sectionIndexInFetchedResults == (NSUInteger)indexPath.section)
         {
             return [NSIndexPath indexPathForRow:indexPath.row inSection:idx];
         }
@@ -347,11 +347,7 @@
 
 - (id)objectAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSUInteger section = indexPath.section;
-    NSUInteger row = indexPath.row;
     indexPath = [self convertUITableViewControllerIndexPathToNSFetchedResultsControllerIndexPath:indexPath];
-    section = indexPath.section;
-    row = indexPath.row;
     if (!indexPath) // Empty section
         return nil;
     

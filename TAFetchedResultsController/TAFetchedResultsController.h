@@ -58,7 +58,7 @@
 @property (nonatomic, readonly) NSArray *sections;
 
 @property (weak, nonatomic) id <TAFetchedResultsControllerDelegate> delegate;
-@property BOOL disabled;
+@property (atomic) BOOL disabled;
 
 /* Initializes an instance of TAFetchedResultsController
  
