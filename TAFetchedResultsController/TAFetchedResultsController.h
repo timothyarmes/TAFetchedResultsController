@@ -9,6 +9,7 @@
 //  It requires a one-to-many (section-to-items) core data model.
 
 #import <CoreData/CoreData.h>
+#import <UIKit/UIKit.h>
 
 // Extend the NSFetchedResultsSectionInfo protocol to return the managed object for the section
 
@@ -23,7 +24,6 @@
 // This is virtually identical to the NSFetchedResultsController protocol except that the controller involved
 // is a TAFetchedResultsControllerDelegate.
 //
-// Note that controller:sectionIndexTitleForSectionName: isn't implemented at this point.
 
 @class TAFetchedResultsController;
 
@@ -54,8 +54,10 @@
 @property (nonatomic, readonly) NSFetchRequest *sectionFetchRequest;
 @property (nonatomic, readonly) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, readonly) NSString *cacheName;
-@property  (nonatomic, readonly) NSArray *fetchedObjects;
+@property (nonatomic, readonly) NSArray *fetchedObjects;
 @property (nonatomic, readonly) NSArray *sections;
+@property (nonatomic, readonly) NSArray *sectionIndexTitles;
+@property (nonatomic, strong)   NSString *sectionIndexTitleKeyPath;
 
 @property (weak, nonatomic) id <TAFetchedResultsControllerDelegate> delegate;
 @property (atomic) BOOL disabled;
@@ -77,6 +79,8 @@
         sectionGroupingKeyPath:(NSString *)sectionGroupingKeyPath
                      cacheName:(NSString *)name;
 
+- (NSInteger)sectionForSectionIndexTitle:(NSString *)title
+                                 atIndex:(NSInteger)sectionIndex;
 
 /* Force the controlled to update the sections. This isn't expected to be useful since it handles this automatically */
 

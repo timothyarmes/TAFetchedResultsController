@@ -189,6 +189,26 @@
     return [_nsFetchedResultsController performFetch:error];
 }
 
+- (NSArray *)sectionIndexTitles
+{
+    NSMutableArray *sectionIndexTitles;
+    for (NSString *sectionTitle in [_sections valueForKey:_sectionIndexTitleKeyPath]) {
+        if ([sectionTitle length] > 0) {
+            NSString *firstLetter = [sectionTitle substringWithRange:[sectionTitle rangeOfComposedCharacterSequenceAtIndex:0]];
+            if (![sectionIndexTitles containsObject:firstLetter]) {
+                [sectionIndexTitles addObject:firstLetter];
+            }
+        }
+    }
+    return sectionIndexTitles;
+}
+
+- (NSInteger)sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)sectionIndex
+{
+    // we want to scroll even to empty sections
+    return sectionIndex;
+}
+
 #pragma mark - Section mapping
 
 - (void)updateSections
@@ -196,6 +216,7 @@
     NSLog(@"Updating section list");
     
     NSError *error = nil;
+    [self.nsFetchedResultsController performFetch:&error];
     NSArray *sections = [_managedObjectContext executeFetchRequest:_sectionFetchRequest error:&error];
     if (sections == nil)
     {
@@ -247,11 +268,17 @@
             // use this to locate the actual section entity. The order of the section array can be totally different to that
             // returned by NSFetchedResultsController :)
             
+            NSLog(@"nameFromFetchResults: %@", nameFromFetchResults);
+            
             BOOL found = NO;
             for (NSUInteger idx = 0; idx < _sections.count; idx++)
             {
                 TASectionInfo *si = [_sections objectAtIndex:idx];
                 NSString *propertyNameForSectionGrouping = [si.theManagedObject valueForKey:_propertyNameForSectionGrouping];
+                if ([propertyNameForSectionGrouping isKindOfClass:[NSNumber class]]) {
+                    propertyNameForSectionGrouping = [((NSNumber *)propertyNameForSectionGrouping) stringValue];
+                }
+                
                 if ([propertyNameForSectionGrouping isEqualToString:nameFromFetchResults])
                 {
                     si.sectionIndexInFetchedResults = sectionIdx;
@@ -401,8 +428,8 @@
         
         self.previousMapping = prevMapping;
     }
-    
-    [self updateSectionMap];
+
+    [self updateSections];
 }
 
 - (void)controller:(NSFetchedResultsController *)controller
@@ -519,7 +546,6 @@
         // Re-fetch the sections list (without the deleted sections) and update us internally
         //
         // Once we've done this the indexes of the sections will be correct for the sections to be inserted and modified
-        
         [self updateSections];
         
         idx = 0;
