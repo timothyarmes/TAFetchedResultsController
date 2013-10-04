@@ -109,6 +109,8 @@
 @synthesize propertyNameForSectionGrouping = _propertyNameForSectionGrouping;
 @synthesize managedObjectContext = _managedObjectContext;
 @synthesize sections = _sections;
+@synthesize sectionIndexTitleKeyPath = _sectionIndexTitleKeyPath;
+
 @synthesize previousMapping = _previousMapping;
 @synthesize disabled = _disabled;
 @synthesize delegate = _delegate;
