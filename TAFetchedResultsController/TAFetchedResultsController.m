@@ -363,7 +363,7 @@
     // There really should be one, other wise we have a big problem
     
     [NSException raise:@"No key found for NSIndexPath supplied by NSFetchedResultsController"
-                format:@"No key found for NSIndexPath supplied by NSFetchedResultsController when searching for [%d, %d]", indexPath.section, indexPath.row
+                format:@"No key found for NSIndexPath supplied by NSFetchedResultsController when searching for [%ld, %ld]", (long)indexPath.section, (long)indexPath.row
      ];
     
     return NULL; // Stop compiler warning
@@ -432,6 +432,20 @@
     }
 
     [self updateSections];
+
+    if ([_delegate respondsToSelector:@selector(controller:didChangeSection:atIndex:forChangeType:)]) {
+        NSIndexPath *convertedIndexPath = [NSIndexPath indexPathForRow:0 inSection:(NSInteger)sectionIndex];
+        if (type != NSFetchedResultsChangeInsert) {
+            // The indexPath must exist - convert it...
+            convertedIndexPath = [self convertNSFetchedResultsSectionIndexToUITableViewControllerSectionIndex:convertedIndexPath usingMapping:self.previousMapping];
+            NSLog(@"Converted sectionIndex from %ld to %ld", (long)sectionIndex, (long)convertedIndexPath.section);
+        }
+
+        [_delegate controller:self
+             didChangeSection:self.previousMapping[(NSUInteger)convertedIndexPath.section]
+                      atIndex:(NSUInteger)convertedIndexPath.section
+                forChangeType:type];
+    }
 }
 
 - (void)controller:(NSFetchedResultsController *)controller
@@ -445,7 +459,7 @@
 
     if ([_delegate respondsToSelector:@selector(controller:didChangeObject:atIndexPath:forChangeType:newIndexPath:)]) {
         
-        NSLog(@"TAFetchedResultsController has intercepted a delegate call to didChangeObject with indexPath [%d, %d] and newIndexPath [%d, %d].", indexPath.section, indexPath.row, newIndexPath.section, newIndexPath.row);
+        NSLog(@"TAFetchedResultsController has intercepted a delegate call to didChangeObject with indexPath [%ld, %ld] and newIndexPath [%ld, %ld].", (long)indexPath.section, (long)indexPath.row, (long)newIndexPath.section, (long)newIndexPath.row);
         
         // Use the previous mapping if there have been section changes
         
@@ -461,13 +475,13 @@
         if (type != NSFetchedResultsChangeInsert) {
             // The indexPath must exist - convert it...
             convertedIndexPath = [self convertNSFetchedResultsSectionIndexToUITableViewControllerSectionIndex:indexPath usingMapping:prevMapping];
-            NSLog(@"Converted indexPath from [%d, %d] to [%d, %d]", indexPath.section, indexPath.row, convertedIndexPath.section, convertedIndexPath.row);
+            NSLog(@"Converted indexPath from [%ld, %ld] to [%ld, %ld]", (long)indexPath.section, (long)indexPath.row, (long)convertedIndexPath.section, (long)convertedIndexPath.row);
         }
         
         if (type == NSFetchedResultsChangeMove || type == NSFetchedResultsChangeInsert) {
             // newIndexPath must exist - convert it...
             convertedNewIndexPath = [self convertNSFetchedResultsSectionIndexToUITableViewControllerSectionIndex:newIndexPath usingMapping:_sections];
-            NSLog(@"Converted newIndexPath from [%d, %d] to [%d, %d]", newIndexPath.section, newIndexPath.row, convertedNewIndexPath.section, convertedNewIndexPath.row);
+            NSLog(@"Converted newIndexPath from [%ld, %ld] to [%ld, %ld]", (long)newIndexPath.section, (long)newIndexPath.row, (long)convertedNewIndexPath.section, (long)convertedNewIndexPath.row);
         }
         
         // Pass this onto the user
@@ -523,7 +537,7 @@
     if ([updatedObjects count] + [deletedObjects count] + [insertedObjects count] == 0)
         return;
     
-    NSLog(@"Section changes detected, %d deleted, %d inserted, %d updated", [deletedObjects count], [insertedObjects count], [updatedObjects count]);
+    NSLog(@"Section changes detected, %lu deleted, %lu inserted, %lu updated", (unsigned long)[deletedObjects count], (unsigned long)[insertedObjects count], (unsigned long)[updatedObjects count]);
     
     // Tell the delegate that we're about to make changes
     
