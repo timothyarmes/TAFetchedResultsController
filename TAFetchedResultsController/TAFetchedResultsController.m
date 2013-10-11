@@ -432,6 +432,20 @@
     }
 
     [self updateSections];
+
+    if ([_delegate respondsToSelector:@selector(controller:didChangeSection:atIndex:forChangeType:)]) {
+        NSIndexPath *convertedIndexPath = [NSIndexPath indexPathForRow:0 inSection:(NSInteger)sectionIndex];
+        if (type != NSFetchedResultsChangeInsert) {
+            // The indexPath must exist - convert it...
+            convertedIndexPath = [self convertNSFetchedResultsSectionIndexToUITableViewControllerSectionIndex:convertedIndexPath usingMapping:self.previousMapping];
+            NSLog(@"Converted sectionIndex from %ld to %ld", (long)sectionIndex, (long)convertedIndexPath.section);
+        }
+
+        [_delegate controller:self
+             didChangeSection:self.previousMapping[(NSUInteger)convertedIndexPath.section]
+                      atIndex:(NSUInteger)convertedIndexPath.section
+                forChangeType:type];
+    }
 }
 
 - (void)controller:(NSFetchedResultsController *)controller
