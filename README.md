@@ -205,7 +205,3 @@ Known Limitations
 TAFetchedResultsController will reponds to changes in your Section objects and call you back to insert, delete or update sections as required.
 
 However, changes to section order are not yet handled, and the behaviour is currently undefined should you do this.
-
-## Indexes are not yet handled
-
-NSFetchedResultController's support for indexes (down the edge of the table view) hasn't yet been added to TAFetchedResultsController. This may happen when the author has such a need for it himself :)
