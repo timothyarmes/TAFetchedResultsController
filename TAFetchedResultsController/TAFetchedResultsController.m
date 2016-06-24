@@ -545,8 +545,10 @@
         [_delegate controllerWillChangeContent:self];
     }
     
-    // Go through the list of changes to send
+    // A flag to see if [self updateSections] is needed
+    BOOL hasSectionUpdated = NO;
     
+    // Go through the list of changes to send
     if ([_delegate respondsToSelector:@selector(controller:didChangeSection:atIndex:forChangeType:)]) {
         
         // Tell the delegate about any deleted rows
@@ -563,6 +565,7 @@
         //
         // Once we've done this the indexes of the sections will be correct for the sections to be inserted and modified
         [self updateSections];
+		hasSectionUpdated = YES;
         
         idx = 0;
         for (TASectionInfo *si in _sections) {
@@ -576,6 +579,11 @@
             }
             idx++;
         }
+    }
+    
+    // If delegate does not response to controller:didChangeSection:atIndex:forChangeType:, [self updateSections] explicitly
+    if (!hasSectionUpdated) {
+        [self updateSections];
     }
     
     // Tell the delegate that we've finished making changes
