@@ -138,8 +138,11 @@
 
         // The last part of the key path is the property in the section Entity that's used for the sort order.
         
-        NSArray *keyNameParts = [sectionGroupingKeyPath componentsSeparatedByString:@"."];
-        self.propertyNameForSectionGrouping = [keyNameParts objectAtIndex:keyNameParts.count - 1];
+        NSRange keyPathRange = [sectionGroupingKeyPath rangeOfString: @"."];
+        if (keyPathRange.location != NSNotFound)
+        {
+            self.propertyNameForSectionGrouping = [sectionGroupingKeyPath substringFromIndex: keyPathRange.location + 1];
+        }
         
         _sectionFetchRequest = sectionFetchRequest;
         _managedObjectContext = context;
